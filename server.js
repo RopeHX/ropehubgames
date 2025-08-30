@@ -7,6 +7,7 @@ const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const mongoose = require('mongoose');
 const Game = require('./models/Game');
+const cookieParser = require('cookie-parser');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,6 +15,7 @@ const io = socketIO(server);
 
 app.use(express.json());
 app.use(express.static('public'));
+app.use(cookieParser());
 
 // MongoDB connection
 mongoose.connect('mongodb://localhost:27017/minigame', { useNewUrlParser: true, useUnifiedTopology: true });
@@ -32,28 +34,40 @@ app.get('/auth/discord', (req, res) => {
 // Discord Callback
 app.get('/auth/discord/callback', async (req, res) => {
     const code = req.query.code;
-    if (!code) return res.status(400).send('No code provided');
+    if (!code) return res.send('Kein Code von Discord erhalten!');
     try {
-        const data = new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
+        // Token holen
+        const params = new URLSearchParams({
+            client_id: process.env.DISCORD_CLIENT_ID,
+            client_secret: process.env.DISCORD_CLIENT_SECRET,
             grant_type: 'authorization_code',
-            code,
-            redirect_uri: REDIRECT_URI,
-            scope: 'identify'
+            code: code,
+            redirect_uri: process.env.DISCORD_REDIRECT_URI
         });
-        const tokenRes = await axios.post('https://discord.com/api/oauth2/token', data.toString(), {
+
+        const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', params.toString(), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
-        const accessToken = tokenRes.data.access_token;
-        const userRes = await axios.get('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${accessToken}` }
+        const tokenData = tokenResponse.data;
+
+        // User-Daten holen
+        const userResponse = await axios.get('https://discord.com/api/users/@me', {
+            headers: { Authorization: `Bearer ${tokenData.access_token}` }
         });
-        const user = userRes.data;
-        // Redirect mit Username und Avatar-ID als URL-Parameter
-        res.redirect(`/index.html?username=${encodeURIComponent(user.username)}&avatar=${user.id}/${user.avatar}`);
+        const user = userResponse.data;
+
+        // Session starten (hier als Cookie, alternativ DB)
+        res.cookie('discord_user', JSON.stringify({
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar
+        }), { httpOnly: true, maxAge: 24*60*60*1000 });
+
+        // Weiterleitung auf Dashboard/Home
+        res.redirect('/dashboard');
     } catch (err) {
-        res.status(500).send('Discord Login fehlgeschlagen');
+        console.error(err);
+        res.send('Fehler beim Discord-Login!');
     }
 });
 
