@@ -12,14 +12,14 @@ const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const REDIRECT_URI = process.env.DISCORD_REDIRECT_URI;
 
-// Discord Login starten
-app.get('/auth/discord', (req, res) => {
+// Discord Login (Endpoint: /login)
+app.get('/login', (req, res) => {
     const url = `https://discord.com/api/oauth2/authorize?client_id=${CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&response_type=code&scope=identify`;
     res.redirect(url);
 });
 
-// Discord Callback
-app.get('/auth/discord/callback', async (req, res) => {
+// Discord Callback (Endpoint: /callback)
+app.get('/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) {
         console.error('Discord OAuth: Kein Code erhalten!');
@@ -58,9 +58,6 @@ app.get('/auth/discord/callback', async (req, res) => {
             username: user.username,
             avatar: user.avatar
         }), { httpOnly: true, maxAge: 24*60*60*1000 });
-
-        // Optional: User in DB speichern (hier nur Log)
-        console.log('Discord User eingeloggt:', user);
 
         res.redirect('/dashboard');
     } catch (err) {
@@ -144,6 +141,9 @@ io.on('connection', (socket) => {
     // ...other events (admin actions, etc.)...
 });
 
+server.listen(3000, () => {
+    console.log('Server running on port 3000');
+});
 server.listen(3000, () => {
     console.log('Server running on port 3000');
 });

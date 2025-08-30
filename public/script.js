@@ -43,11 +43,6 @@ const profileMenu = document.getElementById('profile-menu');
 const avatarEl = document.getElementById('avatar');
 const usernameEl = document.getElementById('username');
 
-// Discord Login
-document.getElementById('discord-login').addEventListener('click', () => {
-    window.location.href = '/auth/discord';
-});
-
 // Gast Login
 document.getElementById('guest-login').addEventListener('click', () => {
     const urlParams = new URLSearchParams(window.location.search);
