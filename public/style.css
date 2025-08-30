@@ -1,0 +1,262 @@
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Arial', sans-serif;
+    background: #0a0a0a; /* reines Schwarz */
+    color: #fff;
+    overflow: hidden;
+    cursor: none;
+}
+
+/* Maus-Trail Glow */
+.cursor-trail {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    pointer-events: none;
+    filter: blur(12px);
+    transform: translate(-50%, -50%);
+    transition: transform 0.05s linear;
+    mix-blend-mode: screen;
+}
+
+/* Event-Banner */
+#event-banner {
+    width: auto;
+    max-width: 90vw;
+    padding: 20px 50px 20px 30px;
+    background: rgba(58,13,89,0.8); /* dunkles Lila */
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    backdrop-filter: blur(10px);
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    border-radius: 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Close-Button für Banner */
+#event-banner-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    font-size: 22px;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+#event-banner-close:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* Discord Event-Banner */
+#discord-event-banner {
+    width: auto;
+    max-width: 90vw;
+    padding: 16px 40px 16px 24px;
+    background: rgba(220,40,40,0.85);
+    color: #fff;
+    font-size: 18px;
+    font-weight: 500;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    backdrop-filter: blur(8px);
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1100;
+    border-radius: 32px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+#discord-event-banner-close {
+    background: rgba(255,255,255,0.15);
+    border: none;
+    color: #fff;
+    font-size: 20px;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+#discord-event-banner-close:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+/* TrueEye Overlay */
+.true-eye {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px 20px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 0 20px rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    font-size: 14px;
+    color: #fff;
+}
+.true-eye img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+.true-eye button {
+    background: rgba(255,255,255,0.1);
+    border: none;
+    padding: 5px 10px;
+    border-radius: 12px;
+    cursor: pointer;
+    color: #fff;
+    transition: 0.2s;
+}
+.true-eye button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Game Area Centered */
+#game-area {
+    position: absolute;
+    top: 60%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.3);
+    padding: 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 400px;
+}
+#game-area input, #game-area button {
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    outline: none;
+}
+#game-area button {
+    cursor: pointer;
+    background: rgba(255,255,255,0.1);
+    color: #fff;
+    transition: 0.2s;
+}
+#game-area button:hover {
+    background: rgba(255,255,255,0.2);
+}
+
+/* Spieler-Liste und Buzz-Result Styling */
+#players-list {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    padding: 10px;
+    min-height: 40px;
+    color: #fff;
+    font-size: 15px;
+    box-shadow: 0 0 8px rgba(255,255,255,0.08);
+    backdrop-filter: blur(4px);
+}
+
+#players-list div {
+    padding: 2px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+}
+#players-list div:last-child {
+    border-bottom: none;
+}
+
+#buzz-result {
+    margin-top: 10px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 10px;
+    padding: 8px;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    box-shadow: 0 0 6px rgba(255,255,255,0.10);
+    min-height: 28px;
+    backdrop-filter: blur(3px);
+}
+
+/* Login-Bereich Styling */
+#login-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+}
+#login-area button {
+    padding: 14px 32px;
+    font-size: 18px;
+    border-radius: 16px;
+    border: none;
+    background: rgba(58,13,89,0.8);
+    color: #fff;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: background 0.2s;
+}
+#login-area button:hover {
+    background: rgba(58,13,89,1);
+}
+
+/* Profil-Menü Styling */
+#profile-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 420px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+#menu {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border-radius: 18px;
+    padding: 18px;
+    box-shadow: 0 0 8px rgba(255,255,255,0.08);
+    backdrop-filter: blur(4px);
+}
+#games-list div {
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    font-size: 18px;
+    color: #fff;
+}
+#games-list div:last-child {
+    border-bottom: none;
+}
