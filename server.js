@@ -21,7 +21,10 @@ app.get('/auth/discord', (req, res) => {
 // Discord Callback
 app.get('/auth/discord/callback', async (req, res) => {
     const code = req.query.code;
-    if (!code) return res.send('Kein Code von Discord erhalten!');
+    if (!code) {
+        console.error('Discord OAuth: Kein Code erhalten!');
+        return res.send('Kein Code von Discord erhalten!');
+    }
     try {
         const params = new URLSearchParams({
             client_id: CLIENT_ID,
@@ -35,23 +38,33 @@ app.get('/auth/discord/callback', async (req, res) => {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
         const tokenData = tokenResponse.data;
+        if (!tokenData.access_token) {
+            console.error('Discord OAuth: Kein Access Token erhalten!', tokenData);
+            return res.send('Fehler beim Token-Abruf!');
+        }
 
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${tokenData.access_token}` }
         });
         const user = userResponse.data;
+        if (!user || !user.id) {
+            console.error('Discord OAuth: Keine Userdaten erhalten!', user);
+            return res.send('Fehler beim Userdaten-Abruf!');
+        }
 
-        // Session als Cookie
+        // Session als Cookie speichern
         res.cookie('discord_user', JSON.stringify({
             id: user.id,
             username: user.username,
             avatar: user.avatar
         }), { httpOnly: true, maxAge: 24*60*60*1000 });
 
-        // Weiterleitung auf Dashboard/Home
+        // Optional: User in DB speichern (hier nur Log)
+        console.log('Discord User eingeloggt:', user);
+
         res.redirect('/dashboard');
     } catch (err) {
-        console.error(err);
+        console.error('Discord OAuth Fehler:', err.response?.data || err.message || err);
         res.send('Fehler beim Discord-Login!');
     }
 });
