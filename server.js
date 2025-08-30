@@ -6,10 +6,10 @@ const app = express();
 app.use(express.static('public'));
 
 app.get('/auth/discord', (req, res) => {
-    const client_id = process.env.CLIENT_ID;
-    const redirect_uri = encodeURIComponent(process.env.REDIRECT_URI);
-    const scope = encodeURIComponent('identify email');
-    const discordAuthUrl = `https://discord.com/api/oauth2/authorize?client_id=${client_id}&redirect_uri=${redirect_uri}&response_type=code&scope=${scope}`;
+    const client_id = '1411357745994797116';
+    const redirect_uri = encodeURIComponent('https://ropub.de/callback');
+    const scope = encodeURIComponent('identify');
+    const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=${scope}`;
     res.redirect(discordAuthUrl);
 });
 
@@ -21,11 +21,11 @@ app.get('/callback', async (req, res) => {
         const tokenResponse = await axios.post(
             'https://discord.com/api/oauth2/token',
             new URLSearchParams({
-                client_id: process.env.CLIENT_ID,
-                client_secret: process.env.CLIENT_SECRET,
+                client_id: '1411357745994797116',
+                client_secret: process.env.DISCORD_CLIENT_SECRET,
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: process.env.REDIRECT_URI,
+                redirect_uri: 'https://ropub.de/callback',
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
