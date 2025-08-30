@@ -10,7 +10,7 @@ app.get('/callback', async (req, res) => {
       client_secret: 'xCWeD5VICWxiiDhr0d0urLrCfWNG42xn',
       code,
       grant_type: 'authorization_code',
-      redirect_uri: 'https://ropehub.de/callback',
+      redirect_uri: 'https://www.ropehub.de/callback',
     }),
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
   }).then(r => r.json());
