@@ -8,7 +8,7 @@ app.use(express.static('public'));
 app.get('/auth/discord', (req, res) => {
     // Discord OAuth2 URL (Client ID und Redirect URI müssen exakt stimmen!)
     const client_id = '1411357745994797116';
-    const redirect_uri = encodeURIComponent('https://www.ropub.de/callback');
+    const redirect_uri = encodeURIComponent('https://www.ropehub.de/callback');
     const scope = encodeURIComponent('identify');
     const discordAuthUrl = `https://discord.com/oauth2/authorize?client_id=${client_id}&response_type=code&redirect_uri=${redirect_uri}&scope=${scope}`;
     res.redirect(discordAuthUrl);
@@ -27,7 +27,7 @@ app.get('/callback', async (req, res) => {
                 client_secret: process.env.DISCORD_CLIENT_SECRET,
                 grant_type: 'authorization_code',
                 code: code,
-                redirect_uri: 'https://www.ropub.de/callback',
+                redirect_uri: 'https://www.ropehub.de/callback',
             }),
             { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
         );
