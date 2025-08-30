@@ -44,7 +44,15 @@ app.get('/callback', async (req, res) => {
         });
         const user = userResponse.data;
 
-        res.send(`Hello ${user.username}`);
+        // Session als Cookie speichern
+        res.cookie('discord_user', JSON.stringify({
+            id: user.id,
+            username: user.username,
+            avatar: user.avatar
+        }), { httpOnly: true, maxAge: 24*60*60*1000 });
+
+        // Weiterleitung auf Dashboard
+        res.redirect('/dashboard');
     } catch (err) {
         console.error(err);
         res.send('Discord OAuth Fehler!');
