@@ -1,26 +1,13 @@
 require('dotenv').config();
 const express = require('express');
-const http = require('http');
-const socketIO = require('socket.io');
 const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
-const bcrypt = require('bcrypt');
-const mongoose = require('mongoose');
-const Game = require('./models/Game');
 const cookieParser = require('cookie-parser');
+const path = require('path');
 
 const app = express();
-const server = http.createServer(app);
-const io = socketIO(server);
-
-app.use(express.json());
-app.use(express.static('public'));
 app.use(cookieParser());
+app.use(express.static('public'));
 
-// MongoDB connection
-mongoose.connect('mongodb://localhost:27017/minigame', { useNewUrlParser: true, useUnifiedTopology: true });
-
-// Discord OAuth2 Keys
 const CLIENT_ID = process.env.DISCORD_CLIENT_ID;
 const CLIENT_SECRET = process.env.DISCORD_CLIENT_SECRET;
 const REDIRECT_URI = process.env.DISCORD_REDIRECT_URI;
@@ -36,13 +23,12 @@ app.get('/auth/discord/callback', async (req, res) => {
     const code = req.query.code;
     if (!code) return res.send('Kein Code von Discord erhalten!');
     try {
-        // Token holen
         const params = new URLSearchParams({
-            client_id: process.env.DISCORD_CLIENT_ID,
-            client_secret: process.env.DISCORD_CLIENT_SECRET,
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
             grant_type: 'authorization_code',
             code: code,
-            redirect_uri: process.env.DISCORD_REDIRECT_URI
+            redirect_uri: REDIRECT_URI
         });
 
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', params.toString(), {
@@ -50,13 +36,12 @@ app.get('/auth/discord/callback', async (req, res) => {
         });
         const tokenData = tokenResponse.data;
 
-        // User-Daten holen
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${tokenData.access_token}` }
         });
         const user = userResponse.data;
 
-        // Session starten (hier als Cookie, alternativ DB)
+        // Session als Cookie
         res.cookie('discord_user', JSON.stringify({
             id: user.id,
             username: user.username,
@@ -69,6 +54,17 @@ app.get('/auth/discord/callback', async (req, res) => {
         console.error(err);
         res.send('Fehler beim Discord-Login!');
     }
+});
+
+// Dummy Dashboard
+app.get('/dashboard', (req, res) => {
+    const user = req.cookies.discord_user ? JSON.parse(req.cookies.discord_user) : null;
+    if (!user) return res.redirect('/');
+    res.sendFile(path.join(__dirname, 'public', 'dashboard.html'));
+});
+
+app.listen(3000, () => {
+    console.log('Server läuft auf Port 3000');
 });
 
 // Create game
