@@ -21,41 +21,33 @@ app.get('/login', (req, res) => {
 // Discord Callback (Endpoint: /callback)
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
-    if (!code) return res.send('No code provided');
+    if (!code) return res.send("Kein Code von Discord erhalten");
 
     try {
-        const params = new URLSearchParams({
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
-            grant_type: 'authorization_code',
-            code,
-            redirect_uri: REDIRECT_URI,
-            scope: 'identify'
+        // Access Token anfordern
+        const tokenResponse = await axios.post(
+            "https://discord.com/api/oauth2/token",
+            new URLSearchParams({
+                client_id: CLIENT_ID,
+                client_secret: CLIENT_SECRET,
+                grant_type: "authorization_code",
+                code,
+                redirect_uri: REDIRECT_URI,
+            }),
+            { headers: { "Content-Type": "application/x-www-form-urlencoded" } }
+        );
+
+        const accessToken = tokenResponse.data.access_token;
+
+        // User Daten holen
+        const userResponse = await axios.get("https://discord.com/api/users/@me", {
+            headers: { Authorization: `Bearer ${accessToken}` },
         });
 
-        const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', params.toString(), {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-        });
-        const tokenData = tokenResponse.data;
-
-        // User-Daten holen
-        const userResponse = await axios.get('https://discord.com/api/users/@me', {
-            headers: { Authorization: `Bearer ${tokenData.access_token}` }
-        });
-        const user = userResponse.data;
-
-        // Session als Cookie speichern
-        res.cookie('discord_user', JSON.stringify({
-            id: user.id,
-            username: user.username,
-            avatar: user.avatar
-        }), { httpOnly: true, maxAge: 24*60*60*1000 });
-
-        // Weiterleitung auf Dashboard
-        res.redirect('/dashboard');
+        res.send(`Hallo ${userResponse.data.username}, Login erfolgreich!`);
     } catch (err) {
         console.error(err);
-        res.send('Discord OAuth Fehler!');
+        res.send("Fehler beim Login");
     }
 });
 
@@ -122,14 +114,15 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('buzz', async ({ gameId, player }) => {
-        // Only first buzz counts per round
-        const buzzKey = `buzzed:${gameId}`;
-        if (!io.sockets.adapter.rooms.get(buzzKey)) {
-            io.sockets.adapter.rooms.set(buzzKey, player);
-            io.to(gameId).emit('buzzed', { player });
-        }
-    });
+socket.on('buzz', async ({ gameId, player }) => {
+    // Only first buzz counts per round
+    const buzzKey = `buzzed:${gameId}`;
+    if (!io.sockets.adapter.rooms.get(buzzKey)) {
+        io.sockets.adapter.rooms.set(buzzKey, player);
+        io.to(gameId).emit('buzzed', { player });
+    }
+});
+// ...other events (admin actions, etc.)...
 
     // ...other events (admin actions, etc.)...
 });
