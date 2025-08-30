@@ -21,48 +21,33 @@ app.get('/login', (req, res) => {
 // Discord Callback (Endpoint: /callback)
 app.get('/callback', async (req, res) => {
     const code = req.query.code;
-    if (!code) {
-        console.error('Discord OAuth: Kein Code erhalten!');
-        return res.send('Kein Code von Discord erhalten!');
-    }
+    if (!code) return res.send('No code provided');
+
     try {
         const params = new URLSearchParams({
             client_id: CLIENT_ID,
             client_secret: CLIENT_SECRET,
             grant_type: 'authorization_code',
-            code: code,
-            redirect_uri: REDIRECT_URI
+            code,
+            redirect_uri: REDIRECT_URI,
+            scope: 'identify'
         });
 
         const tokenResponse = await axios.post('https://discord.com/api/oauth2/token', params.toString(), {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
         });
         const tokenData = tokenResponse.data;
-        if (!tokenData.access_token) {
-            console.error('Discord OAuth: Kein Access Token erhalten!', tokenData);
-            return res.send('Fehler beim Token-Abruf!');
-        }
 
+        // User-Daten holen
         const userResponse = await axios.get('https://discord.com/api/users/@me', {
             headers: { Authorization: `Bearer ${tokenData.access_token}` }
         });
         const user = userResponse.data;
-        if (!user || !user.id) {
-            console.error('Discord OAuth: Keine Userdaten erhalten!', user);
-            return res.send('Fehler beim Userdaten-Abruf!');
-        }
 
-        // Session als Cookie speichern
-        res.cookie('discord_user', JSON.stringify({
-            id: user.id,
-            username: user.username,
-            avatar: user.avatar
-        }), { httpOnly: true, maxAge: 24*60*60*1000 });
-
-        res.redirect('/dashboard');
+        res.send(`Hello ${user.username}`);
     } catch (err) {
-        console.error('Discord OAuth Fehler:', err.response?.data || err.message || err);
-        res.send('Fehler beim Discord-Login!');
+        console.error(err);
+        res.send('Discord OAuth Fehler!');
     }
 });
 
@@ -139,11 +124,4 @@ io.on('connection', (socket) => {
     });
 
     // ...other events (admin actions, etc.)...
-});
-
-server.listen(3000, () => {
-    console.log('Server running on port 3000');
-});
-server.listen(3000, () => {
-    console.log('Server running on port 3000');
 });
