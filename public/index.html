@@ -4,45 +4,146 @@
     <meta charset="UTF-8">
     <title>LeFox Event</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            background: linear-gradient(120deg, #1a0033 0%, #3a0d59 100%);
+            color: #fff;
+            font-family: 'Montserrat', Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+        }
+        .main-container {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(40, 0, 60, 0.85);
+            border-radius: 32px;
+            box-shadow: 0 8px 32px rgba(58,13,89,0.45);
+            padding: 54px 38px 38px 38px;
+            width: 420px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 34px;
+            backdrop-filter: blur(10px);
+        }
+        .event-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .event-logo {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: linear-gradient(135deg,#a259ff,#3a0d59);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 16px #a259ff80;
+        }
+        .event-title {
+            font-size: 2.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            margin-bottom: 2px;
+            background: linear-gradient(90deg,#a259ff,#3a0d59);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .event-date {
+            font-size: 1.18rem;
+            color: #a259ff;
+            margin-bottom: 12px;
+        }
+        .discord-hint {
+            background: rgba(162,89,255,0.13);
+            color: #a259ff;
+            border-radius: 12px;
+            padding: 12px 20px;
+            font-size: 1.08rem;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .login-btn, .guest-btn {
+            width: 100%;
+            padding: 16px 0;
+            font-size: 1.18rem;
+            border-radius: 16px;
+            border: none;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg,#3a0d59,#a259ff);
+            color: #fff;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(58,13,89,0.18);
+            transition: background 0.2s;
+        }
+        .login-btn:hover {
+            background: linear-gradient(90deg,#a259ff,#3a0d59);
+        }
+        .guest-btn {
+            background: #1a0033;
+            color: #fff;
+            border: 1px solid #a259ff;
+        }
+        .guest-btn:hover {
+            background: #a259ff;
+            color: #fff;
+        }
+        .avatar-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 2px solid #a259ff;
+            margin-bottom: 10px;
+            object-fit: cover;
+            background: #fff;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 1rem;
+            color: #aaa;
+        }
+        .mouse-trail-info {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #a259ff;
+            text-align: center;
+            opacity: 0.7;
+        }
+    </style>
 </head>
 <body>
-    <!-- Hinweis-Banner für Events -->
-    <div id="discord-event-banner">
-        <span>Für Event-Teilnahme ist Discord-Login erforderlich!</span>
-        <button id="discord-event-banner-close" title="Schließen">&times;</button>
-    </div>
-
-    <!-- Event-Banner -->
-    <div id="event-banner">
-        LeFox Event – Freitag, 5.8.
-        <button id="event-banner-close" title="Schließen">&times;</button>
-    </div>
-
-    <!-- Login Auswahl -->
-    <div id="login-area">
-        <a href="https://discord.com/oauth2/authorize?client_id=1411357745994797116&response_type=code&redirect_uri=https%3A%2F%2Fwww.ropub.de%2Fcallback&scope=identify" id="discord-login" class="login-btn">Login mit Discord</a>
-        <button id="guest-login">Als Gast fortfahren</button>
-    </div>
-
-    <!-- Profil & Menü (erst nach Login sichtbar) -->
-    <div id="profile-menu" style="display:none;">
-        <div id="profile" class="true-eye">
-            <img id="avatar" src="images/default-avatar.png" alt="Avatar">
-            <span id="username">Gast</span>
-            <button id="logout">Abmelden</button>
+    <div class="main-container">
+        <div class="event-header">
+            <div class="event-logo">🦊</div>
+            <div class="event-title">LeFox Event</div>
+            <div class="event-date">Freitag, 5.8.</div>
         </div>
-        <div id="menu">
-            <h2>Spiele</h2>
-            <div id="games-list"></div>
+        <div class="discord-hint">
+            Für Event-Teilnahme ist Discord-Login erforderlich!
+        </div>
+        <img src="images/default-avatar.png" alt="Avatar" class="avatar-preview" id="avatar-preview">
+        <a href="/auth/discord" class="login-btn">Mit Discord anmelden</a>
+        <button class="guest-btn" id="guest-login">Als Gast fortfahren</button>
+        <div class="mouse-trail-info">
+            <span>✨ Lila/Schwarz Theme &amp; Maus-Trail aktiv ✨</span>
+        </div>
+        <div class="footer">
+            <span>Powered by RopeHub &copy; 2024</span>
         </div>
     </div>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script src="script.js"></script>
     <script>
-        document.getElementById('discord-login').addEventListener('click', ()=>{
-            window.location.href = '/auth/discord';
-        });
+        document.getElementById('guest-login').onclick = function() {
+            alert('Du bist jetzt als Gast unterwegs. Für Events bitte mit Discord anmelden!');
+        };
     </script>
 </body>
 </html>
